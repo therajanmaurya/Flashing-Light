@@ -47,15 +47,8 @@ public class MainActivity extends ActionBarActivity {
         if (keyvalue.length() == 0 || keyvalue == null) {
             start.setChecked(true);
             //starting the services if father camera is available
-            PackageManager pm = context.getPackageManager();
-            if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
 
-                setDetectEnabled(!detectEnabled);
-                Toast.makeText(this, "Camera flash is Available", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, " null Sorry Camera flash is not Available", Toast.LENGTH_SHORT).show();
-
-            }
+            start_server(false);
 
         }
 
@@ -65,32 +58,16 @@ public class MainActivity extends ActionBarActivity {
             start.setChecked(true);
             //starting the services if father camera is available
 
-            PackageManager pm = context.getPackageManager();
-            if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-
-                setDetectEnabled(!detectEnabled);
-                Toast.makeText(this, "Camera flash is Available", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "start Sorry Camera flash is not Available", Toast.LENGTH_SHORT).show();
-
-            }
+            start_server(false);
 
         }
         if (keyvalue.contentEquals("stop")  ) {
-            Log.e("where","in stop");
+            Log.e("where", "in stop");
             Toast.makeText(this, "stoping" ,Toast.LENGTH_SHORT).show();
             int n = 43;
             stop.setChecked(true);
             //stopping the services if father camera is available
-            PackageManager pm = context.getPackageManager();
-            if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-
-                setDetectEnabled(detectEnabled);
-                Toast.makeText(this, "Camera flash is Available", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "stop Sorry Camera flash is not Available", Toast.LENGTH_SHORT).show();
-
-            }
+            start_server(true);
 
         }
     }
@@ -111,6 +88,7 @@ public class MainActivity extends ActionBarActivity {
                 editor.putString(getString(R.string.key), "start");
                 editor.commit();
                 //witting value "start" in sharedprefreces
+                start_server(false);
 
                 //Toast.makeText(this, "start flashing light", Toast.LENGTH_SHORT).show();
 
@@ -123,6 +101,8 @@ public class MainActivity extends ActionBarActivity {
                 editor.putString(getString(R.string.key), "stop");
                 editor.commit();
                 //witting value "stop" in sharedprefreces
+                start_server(true);
+
 
                 break;
         }
@@ -158,13 +138,33 @@ public class MainActivity extends ActionBarActivity {
         if (enable) {
             // start detect service
             startService(intent);
+            Toast.makeText(this,"server start",Toast.LENGTH_SHORT).show();
+
 
         } else {
             // stop detect service
             stopService(intent);
+            Toast.makeText(this,"server stop",Toast.LENGTH_SHORT).show();
 
         }
     }
+
+    private void start_server(boolean value){
+
+        detectEnabled = value;
+        Context context = getApplicationContext();
+        PackageManager pm = context.getPackageManager();
+        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+
+            setDetectEnabled(!detectEnabled);
+            Toast.makeText(this, "start Camera flash is Available", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "start Sorry Camera flash is not Available", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
 
 
 }
