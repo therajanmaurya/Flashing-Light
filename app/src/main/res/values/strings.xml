@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Flashing LIght</string>
+    <string name="app_name">Flashing Light</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="key">flash_key</string>
 </resources>
