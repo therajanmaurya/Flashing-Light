@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
@@ -25,11 +26,12 @@ public class MainActivity extends ActionBarActivity {
 
     private Toolbar toolbar;
     private RadioButton start, stop;
-    private boolean detectEnabled;
+    private boolean detectEnabled ,checkbox;
     public static String keyvalue = null;
     private int MY_DATA_CHECK_CODE = 0;
     private TextToSpeech myTTS;
     public Text_to_speech t;
+    CheckBox box ;
 
 
 
@@ -41,16 +43,24 @@ public class MainActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         start = (RadioButton) findViewById(R.id.radio_start);
         stop = (RadioButton) findViewById(R.id.radio_stop);
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        box = (CheckBox)findViewById(R.id.checkbox_cheese);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
 
 
 
         // getting value from sharedprefreces to enable the radio button
         keyvalue = sharedPref.getString(getString(R.string.key), "");
-
+        checkbox = sharedPref.getBoolean(getString(R.string.key_check),false);
+        Toast.makeText(this,""+checkbox ,Toast.LENGTH_SHORT).show();
 
 //        Log.e("value of keyvalue",keyvalue);
 //        Toast.makeText(this, keyvalue, Toast.LENGTH_SHORT).show();
+
+        if(checkbox == true){
+            box.setChecked(true);
+        }else {
+            box.setChecked(false);
+        }
 
         if (keyvalue.length() == 0 || keyvalue == null) {
             start.setChecked(true);
@@ -78,11 +88,39 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.checkbox_cheese:
+                if (checked){
+
+                    editor.putBoolean(getString(R.string.key_check),true);
+                    editor.commit();
+                    Toast.makeText(this,"check",Toast.LENGTH_SHORT).show();
+                } else  {
+                    editor.putBoolean(getString(R.string.key_check),false);
+                    editor.commit();
+                    Toast.makeText(this,"uncheck" ,Toast.LENGTH_SHORT).show();
+                }
+                // Cheese me
+
+                // I'm lactose intolerant
+                break;
+            // TODO: Veggie sandwich
+        }
+    }
+
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         // Check which radio button was clicked

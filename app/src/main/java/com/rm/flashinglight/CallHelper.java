@@ -28,10 +28,10 @@ public class CallHelper {
         Camera mCamera;
         private Parameters p;
         String flashMode;
-        SharedPreferences sp = ctx.getSharedPreferences("flash", Activity.MODE_PRIVATE);
+        SharedPreferences sp = ctx.getSharedPreferences("MainActivity", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         MainActivity mainactivity;
-
+        boolean voicevalue;
 
         @SuppressLint("NewApi")
         @Override
@@ -79,22 +79,28 @@ public class CallHelper {
                     }
 
                     // get contact name
-                    String name = mainactivity.getContactName(ctx,incomingNumber);
-
+                    String name = mainactivity.getContactName(ctx, incomingNumber);
+                    voicevalue = sp.getBoolean("check", false);
                     // check text_to_speech is running or not
                     // if not , then start the service
-                    Toast.makeText(ctx,name,Toast.LENGTH_LONG).show();
-                    Log.e("name",name);
+                    Toast.makeText(ctx, name, Toast.LENGTH_LONG).show();
+                    Log.e("name", name);
                     if (name.length() == 0 || name.isEmpty()) {
                         name = "unknown person is calling";
                         editor.putString("caller_name", name);
                         editor.commit();
-                        mainactivity.start_voicecall(ctx,true);
+                        if (voicevalue == true) {
+                            mainactivity.start_voicecall(ctx, true);
+                        }
+
                     } else {
                         name = name + " is calling";
                         editor.putString("caller_name", name);
                         editor.commit();
-                        mainactivity.start_voicecall(ctx,true);
+                        if (voicevalue == true) {
+                            mainactivity.start_voicecall(ctx, true);
+                        }
+
                     }
 
 
@@ -105,8 +111,9 @@ public class CallHelper {
 
                     // check text_to_speech service is running or not
 //                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                        mainactivity.start_voicecall(ctx,false);
-//                    }
+                    if (voicevalue == true) {
+                        mainactivity.start_voicecall(ctx, false);
+                    }
 
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
@@ -137,7 +144,7 @@ public class CallHelper {
 
                     // check text_to_speech service is running or not
 //                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                       // mainactivity.start_voicecall(false);
+                    // mainactivity.start_voicecall(false);
 //                    }
 
                     flashMode = sp.getString("flash", flashMode);

@@ -29,7 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onRadioButtonClicked"
-                    android:text="Start Flashing Light"/>
+                    android:text="Start Flashing Light" />
 
                 <RadioButton
                     android:id="@+id/radio_stop"
@@ -38,6 +38,23 @@
                     android:onClick="onRadioButtonClicked"
                     android:text="Stop Flashing Light" />
             </RadioGroup>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/voice_call"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/card_view"
+            android:layout_margin="10dp"
+            card_view:cardCornerRadius="4dp">
+
+            <CheckBox
+                android:id="@+id/checkbox_cheese"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onCheckboxClicked"
+                android:text="Enable Voice during call" />
+
         </android.support.v7.widget.CardView>
 
     </RelativeLayout>
