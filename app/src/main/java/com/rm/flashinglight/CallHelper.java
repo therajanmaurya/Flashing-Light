@@ -81,23 +81,23 @@ public class CallHelper {
                     }
 
                     // Text To speech contact name
-                    String name = mainactivity.getContactName(incomingNumber);
+//                    String name = mainactivity.getContactName(incomingNumber);
 
                     // check text_to_speech is running or not
                     // if not , then start the service
 //                    if(!mainactivity.isMyServiceRunning(Text_to_speech.class)) {
 
-                        if (name.length() == 0 || name.isEmpty()) {
-                            name = "unknown person is calling";
-                            editor.putString("caller_name", name);
-                            editor.commit();
-                            mainactivity.start_voicecall(true);
-                        } else {
-                            name = name + " is calling";
-                            editor.putString("caller_name", name);
-                            editor.commit();
-                            mainactivity.start_voicecall(true);
-                        }
+//                        if (name.length() == 0 || name.isEmpty()) {
+//                            name = "unknown person is calling";
+//                            editor.putString("caller_name", name);
+//                            editor.commit();
+//                            mainactivity.start_voicecall(true);
+//                        } else {
+//                            name = name + " is calling";
+//                            editor.putString("caller_name", name);
+//                            editor.commit();
+//                            mainactivity.start_voicecall(true);
+//                        }
 
 //                    }
 
@@ -108,7 +108,7 @@ public class CallHelper {
 
                     // check text_to_speech service is running or not
 //                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                        mainactivity.start_voicecall(false);
+                       // mainactivity.start_voicecall(false);
 //                    }
 
                     flashMode = sp.getString("flash", flashMode);
