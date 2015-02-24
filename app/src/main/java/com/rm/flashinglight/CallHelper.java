@@ -85,7 +85,7 @@ public class CallHelper {
 
                     // check text_to_speech is running or not
                     // if not , then start the service
-                    if(!mainactivity.isMyServiceRunning(Text_to_speech.class)) {
+//                    if(!mainactivity.isMyServiceRunning(Text_to_speech.class)) {
 
                         if (name.length() == 0 || name.isEmpty()) {
                             name = "unknown person is calling";
@@ -99,7 +99,7 @@ public class CallHelper {
                             mainactivity.start_voicecall(true);
                         }
 
-                    }
+//                    }
 
                     Toast.makeText(ctx, "Incoming: " + incomingNumber,
                             Toast.LENGTH_LONG).show();
@@ -107,9 +107,9 @@ public class CallHelper {
                 case TelephonyManager.CALL_STATE_OFFHOOK:
 
                     // check text_to_speech service is running or not
-                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
+//                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
                         mainactivity.start_voicecall(false);
-                    }
+//                    }
 
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
@@ -139,9 +139,9 @@ public class CallHelper {
                 case TelephonyManager.CALL_STATE_IDLE:
 
                     // check text_to_speech service is running or not
-                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                        mainactivity.start_voicecall(false);
-                    }
+//                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
+                       // mainactivity.start_voicecall(false);
+//                    }
 
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
