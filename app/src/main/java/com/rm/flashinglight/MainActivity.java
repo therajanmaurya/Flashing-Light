@@ -1,5 +1,6 @@
 package com.rm.flashinglight;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -194,46 +195,36 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void start_voicecall(Boolean SS){
+    public void start_voicecall( Context context,Boolean SS){
 
-        Intent intent = new Intent(this, Text_to_speech.class);
+        Intent intent = new Intent(context, Text_to_speech.class);
         if(SS){
             //start service
-            this.startService(intent);
+            context.startService(intent);
         }else {
             //stop service
-            this.stopService(intent);
+            context.stopService(intent);
         }
 
 
     }
 
 
-    public String getContactName(final String phoneNumber) {
-        Uri mBaseUri, uri;
-        String[] projection;
-        mBaseUri = Contacts.Phones.CONTENT_FILTER_URL;
-        projection = new String[]{android.provider.Contacts.People.NAME};
-        try {
-            Class<?> c = Class
-                    .forName("android.provider.ContactsContract$PhoneLookup");
-            mBaseUri = (Uri) c.getField("CONTENT_FILTER_URI").get(mBaseUri);
-            projection = new String[]{"display_name"};
-        } catch (Exception e) {
+    public static String getContactName(Context context, String phoneNumber) {
+        ContentResolver cr = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+        if (cursor == null) {
+            return null;
         }
-
-        uri = Uri.withAppendedPath(mBaseUri, Uri.encode(phoneNumber));
-        Cursor cursor = this.getContentResolver().query(uri, projection, null,
-                null, null);
-
-        String contactName = "";
-
+        String contactName = null;
         if (cursor.moveToFirst()) {
-            contactName = cursor.getString(0);
+            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
         }
 
-        cursor.close();
-        cursor = null;
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
 
         return contactName;
     }

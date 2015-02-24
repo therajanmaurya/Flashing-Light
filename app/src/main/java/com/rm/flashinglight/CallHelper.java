@@ -28,8 +28,6 @@ public class CallHelper {
         Camera mCamera;
         private Parameters p;
         String flashMode;
-        private boolean start = true;
-        private boolean stop = false;
         SharedPreferences sp = ctx.getSharedPreferences("flash", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         MainActivity mainactivity;
@@ -80,26 +78,25 @@ public class CallHelper {
                         editor.commit();
                     }
 
-                    // Text To speech contact name
-//                    String name = mainactivity.getContactName(incomingNumber);
+                    // get contact name
+                    String name = mainactivity.getContactName(ctx,incomingNumber);
 
                     // check text_to_speech is running or not
                     // if not , then start the service
-//                    if(!mainactivity.isMyServiceRunning(Text_to_speech.class)) {
+                    Toast.makeText(ctx,name,Toast.LENGTH_LONG).show();
+                    Log.e("name",name);
+                    if (name.length() == 0 || name.isEmpty()) {
+                        name = "unknown person is calling";
+                        editor.putString("caller_name", name);
+                        editor.commit();
+                        mainactivity.start_voicecall(ctx,true);
+                    } else {
+                        name = name + " is calling";
+                        editor.putString("caller_name", name);
+                        editor.commit();
+                        mainactivity.start_voicecall(ctx,true);
+                    }
 
-//                        if (name.length() == 0 || name.isEmpty()) {
-//                            name = "unknown person is calling";
-//                            editor.putString("caller_name", name);
-//                            editor.commit();
-//                            mainactivity.start_voicecall(true);
-//                        } else {
-//                            name = name + " is calling";
-//                            editor.putString("caller_name", name);
-//                            editor.commit();
-//                            mainactivity.start_voicecall(true);
-//                        }
-
-//                    }
 
                     Toast.makeText(ctx, "Incoming: " + incomingNumber,
                             Toast.LENGTH_LONG).show();
@@ -108,7 +105,7 @@ public class CallHelper {
 
                     // check text_to_speech service is running or not
 //                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                       // mainactivity.start_voicecall(false);
+                        mainactivity.start_voicecall(ctx,false);
 //                    }
 
                     flashMode = sp.getString("flash", flashMode);

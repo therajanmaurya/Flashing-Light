@@ -1,12 +1,13 @@
 package com.rm.flashinglight;
 
-import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -18,13 +19,16 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     private String str;
     private TextToSpeech mTts;
     private static final String TAG = "TTSService";
-    SharedPreferences sp = this.getSharedPreferences("flash", Activity.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sp.edit();
+    Context context;
+
+
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        //Toast.makeText(this,"onstart",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"onstart",Toast.LENGTH_SHORT).show();
         sayHello(str);
 
         Log.v(TAG, "onstart_service");
@@ -34,12 +38,16 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     @Override
     public void onCreate() {
 
+        SharedPreferences sp = getSharedPreferences("flash",MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sp.edit();
         mTts = new TextToSpeech(this,
                 this  // OnInitListener
         );
-        mTts.setSpeechRate(0.5f);
+
+        mTts.setSpeechRate(0.75f);
         Log.v(TAG, "oncreate_service");
         str =  sp.getString("caller_name", "");
+        //str = "rajan is calling you sir please take the call";
         super.onCreate();
     }
 
@@ -62,7 +70,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     @Override
     public void onInit(int status) {
 
-        //Toast.makeText(this,"init",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"init", Toast.LENGTH_SHORT).show();
         Log.v(TAG, "oninit");
         if (status == TextToSpeech.SUCCESS) {
             int result = mTts.setLanguage(Locale.US);
@@ -71,7 +79,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
                 Log.v(TAG, "Language is not available.");
             } else {
 
-                //sayHello(str);
+                sayHello(str);
 
             }
         } else {
