@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.media.AudioManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class CallHelper {
         public void onCallStateChanged(int state, String incomingNumber) {
 
             mainactivity = new MainActivity();
+            voicevalue = sp.getBoolean("check", false);
 
             if (mCamera == null) {
                 try {
@@ -78,9 +80,13 @@ public class CallHelper {
                         editor.commit();
                     }
 
+                    // set phone on silent
+                    AudioManager am  = (AudioManager)ctx.getSystemService(Context.AUDIO_SERVICE);
+                    am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+
                     // get contact name
                     String name = mainactivity.getContactName(ctx, incomingNumber);
-                    voicevalue = sp.getBoolean("check", false);
+
                     // check text_to_speech is running or not
                     // if not , then start the service
                     Toast.makeText(ctx, name, Toast.LENGTH_LONG).show();
@@ -146,6 +152,10 @@ public class CallHelper {
 //                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
                     // mainactivity.start_voicecall(false);
 //                    }
+                    if (voicevalue == true) {
+                        mainactivity.start_voicecall(ctx, false);
+                       // Toast.makeText(ctx,"service stop done" , Toast.LENGTH_SHORT).show();
+                    }
 
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {

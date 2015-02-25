@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -20,7 +21,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     private TextToSpeech mTts;
     private static final String TAG = "TTSService";
     Context context;
-
+    Handler mHandler = new Handler();
 
 
 
@@ -79,7 +80,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
                 Log.v(TAG, "Language is not available.");
             } else {
 
-                sayHello(str);
+                //sayHello(str);
 
             }
         } else {
@@ -89,11 +90,42 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     }
 
     private void sayHello(String str) {
-        mTts.speak(str,
-                TextToSpeech.QUEUE_FLUSH,
-                null);
+        final String str1 = str;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                while (true) {
+                    try {
+
+                        Thread.sleep(5000);
+
+                        mHandler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                // Write your code here to update the UI.
+
+                                mTts.speak(str1,
+                                        TextToSpeech.QUEUE_FLUSH,
+                                        null);
+
+
+
+                            }
+                        });
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
+                }
+            }
+        }).start();
+
+    }
     }
 
 
-}
+
 
