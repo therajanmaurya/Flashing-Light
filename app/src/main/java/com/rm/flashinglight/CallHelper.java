@@ -81,42 +81,34 @@ public class CallHelper {
                     }
 
                     // set phone on silent
-                    AudioManager am  = (AudioManager)ctx.getSystemService(Context.AUDIO_SERVICE);
+                    AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
                     am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-
                     // get contact name
                     String name = mainactivity.getContactName(ctx, incomingNumber);
-
-                    // check text_to_speech is running or not
-                    // if not , then start the service
-                    Toast.makeText(ctx, name, Toast.LENGTH_LONG).show();
-                    Log.e("name", name);
-                    if (name.length() == 0 || name.isEmpty()) {
-                        name = "unknown person is calling";
-                        editor.putString("caller_name", name);
-                        editor.commit();
-                        if (voicevalue == true) {
-                            mainactivity.start_voicecall(ctx, true);
-                        }
-
-                    } else {
-                        name = name + " is calling";
-                        editor.putString("caller_name", name);
-                        editor.commit();
-                        if (voicevalue == true) {
-                            mainactivity.start_voicecall(ctx, true);
-                        }
-
+                    //check contact name is coming null or not;
+                    if (name == null) {
+                        name = "unknown person";
                     }
 
+                    /////////////////////
+                    Toast.makeText(ctx, name + voicevalue, Toast.LENGTH_LONG).show();
+                    ////////////////////
+                    name = name + " is calling";
+                    editor.putString("caller_name", name);
+                    editor.commit();
+                    if (voicevalue == true) {
 
-                    Toast.makeText(ctx, "Incoming: " + incomingNumber,
-                            Toast.LENGTH_LONG).show();
+                        mainactivity.start_voicecall(ctx, true);
+
+                    }
+                    /////////////////////
+                    Toast.makeText(ctx, "Incoming: " + incomingNumber, Toast.LENGTH_LONG).show();
+                    ////////////////////
+
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
 
                     // check text_to_speech service is running or not
-//                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
                     if (voicevalue == true) {
                         mainactivity.start_voicecall(ctx, false);
                     }
@@ -149,12 +141,8 @@ public class CallHelper {
                 case TelephonyManager.CALL_STATE_IDLE:
 
                     // check text_to_speech service is running or not
-//                    if (mainactivity.isMyServiceRunning(Text_to_speech.class)) {
-                    // mainactivity.start_voicecall(false);
-//                    }
                     if (voicevalue == true) {
                         mainactivity.start_voicecall(ctx, false);
-                       // Toast.makeText(ctx,"service stop done" , Toast.LENGTH_SHORT).show();
                     }
 
                     flashMode = sp.getString("flash", flashMode);

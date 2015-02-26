@@ -90,6 +90,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     }
 
     private void sayHello(String str) {
+
         final String str1 = str;
 
         new Thread(new Runnable() {
