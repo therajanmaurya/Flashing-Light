@@ -39,7 +39,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     @Override
     public void onCreate() {
 
-        SharedPreferences sp = getSharedPreferences("flash",MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
 //        SharedPreferences.Editor editor = sp.edit();
         mTts = new TextToSpeech(this,
                 this  // OnInitListener
@@ -93,6 +93,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
 
         final String str1 = str;
 
+        Log.v(TAG, "voice");
         new Thread(new Runnable() {
             @Override
             public void run() {

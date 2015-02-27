@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -82,7 +81,9 @@ public class CallHelper {
 
                     // set phone on silent
                     AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-                    am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                    am.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
                     // get contact name
                     String name = mainactivity.getContactName(ctx, incomingNumber);
                     //check contact name is coming null or not;
@@ -99,6 +100,7 @@ public class CallHelper {
                     if (voicevalue == true) {
 
                         mainactivity.start_voicecall(ctx, true);
+                        Toast.makeText(ctx, name + "is calling", Toast.LENGTH_LONG).show();
 
                     }
                     /////////////////////
@@ -174,6 +176,9 @@ public class CallHelper {
             }
         }
 
+
+
+
     }
 
     /**
@@ -214,9 +219,9 @@ public class CallHelper {
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-        IntentFilter intentFilter = new IntentFilter(
-                Intent.ACTION_NEW_OUTGOING_CALL);
-        ctx.registerReceiver(outgoingReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter(
+//                Intent.ACTION_NEW_OUTGOING_CALL);
+//        ctx.registerReceiver(outgoingReceiver, intentFilter);
     }
 
     /**
@@ -226,6 +231,8 @@ public class CallHelper {
         tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
         ctx.unregisterReceiver(outgoingReceiver);
     }
+
+
 
 
 }
