@@ -95,6 +95,7 @@ public class MainActivity extends ActionBarActivity {
 
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
+        Intent intent = new Intent(this, Text_to_speech.class);
         // Check which checkbox was clicked
         switch(view.getId()) {
             case R.id.checkbox_cheese:
@@ -102,10 +103,12 @@ public class MainActivity extends ActionBarActivity {
 
                     editor.putBoolean(getString(R.string.key_check),true);
                     editor.commit();
+                    startService(intent);
                     Toast.makeText(this,"check",Toast.LENGTH_SHORT).show();
                 } else  {
                     editor.putBoolean(getString(R.string.key_check),false);
                     editor.commit();
+                    stopService(intent);
                     Toast.makeText(this,"uncheck" ,Toast.LENGTH_SHORT).show();
                 }
                 // Cheese me
