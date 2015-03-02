@@ -8,13 +8,20 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Locale;
 
 /**
  * Created by rajanmaurya on 23/2/15.
  */
+
+
+/*
+*
+* this class Handle the all text to speech events
+*
+*
+* */
 public class Text_to_speech extends Service implements TextToSpeech.OnInitListener {
 
     private String str;
@@ -24,31 +31,54 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
     Handler mHandler = new Handler();
 
 
-
-
+    /*
+    *
+    * onStartCommand is the service function that act as a main function
+    * so when class called it runs first
+    *
+    * */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Toast.makeText(this,"onstart",Toast.LENGTH_SHORT).show();
+        /*
+        *
+        * this function convert the text to speech
+        *
+        * */
         sayHello(str);
 
         Log.v(TAG, "onstart_service");
+
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onCreate() {
 
-        SharedPreferences sp = getSharedPreferences(getString(R.string.key_MainActivity),MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sp.edit();
-        mTts = new TextToSpeech(this,
-                this  // OnInitListener
-        );
+        /*
+        *
+        *making sharedprefrences object with MainActivity key
+        *
+        * */
+        SharedPreferences sp = getSharedPreferences(getString(R.string.key_MainActivity), MODE_PRIVATE);
 
+        /*
+        *
+        * initializing the TTF
+        * And setting the speed of SpeechRate
+        *
+        * */
+        mTts = new TextToSpeech(this, this );
         mTts.setSpeechRate(0.75f);
         Log.v(TAG, "oncreate_service");
-        str =  sp.getString("caller_name", "");
-        //str = "rajan is calling you sir please take the call";
+
+        /*
+        *
+        * getting the value from sharedprefrences
+        *
+        * */
+        str = sp.getString("caller_name", "");
+
         super.onCreate();
     }
 
@@ -68,11 +98,18 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
         return null;
     }
 
+
+    /*
+    *
+    *
+    * this is the initializer that initialize the TTF and set the language
+    *
+    *
+    * */
     @Override
     public void onInit(int status) {
 
-        Toast.makeText(this,"init", Toast.LENGTH_SHORT).show();
-        Log.v(TAG, "oninit");
+
         if (status == TextToSpeech.SUCCESS) {
             int result = mTts.setLanguage(Locale.US);
             if (result == TextToSpeech.LANG_MISSING_DATA ||
@@ -80,7 +117,11 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
                 Log.v(TAG, "Language is not available.");
             } else {
 
-                //sayHello(str);
+                    /*
+                    *
+                    * do nothing
+                    *
+                    * */
 
             }
         } else {
@@ -89,6 +130,13 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
 
     }
 
+
+    /*
+    *
+    * this is the main text to speech function that speak the "user name" + is calling
+    * with a 5 second defence using thread
+    *
+    * */
     private void sayHello(String str) {
 
         final String str1 = str;
@@ -101,6 +149,12 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
                 while (true) {
                     try {
 
+
+                        /*
+                        *
+                        * time to delay to run again same function
+                        *
+                        * */
                         Thread.sleep(5000);
 
                         mHandler.post(new Runnable() {
@@ -110,10 +164,12 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
                                 // TODO Auto-generated method stub
                                 // Write your code here to update the UI.
 
-                                mTts.speak(str1,
-                                        TextToSpeech.QUEUE_FLUSH,
-                                        null);
-
+                                /*
+                                *
+                                * this function is translator
+                                *
+                                * */
+                                mTts.speak( str1, TextToSpeech.QUEUE_FLUSH , null);
 
 
                             }
@@ -126,7 +182,7 @@ public class Text_to_speech extends Service implements TextToSpeech.OnInitListen
         }).start();
 
     }
-    }
+}
 
 
 

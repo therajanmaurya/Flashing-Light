@@ -2,9 +2,7 @@ package com.rm.flashinglight;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -40,6 +38,14 @@ public class CallHelper {
             mainactivity = new MainActivity();
             voicevalue = sp.getBoolean("check", false);
 
+            /*
+            *
+            * checking camera is open or not.
+            * if not so open it and initialize the camera
+            *
+            * */
+
+
             if (mCamera == null) {
                 try {
                     mCamera = Camera.open();
@@ -51,23 +57,57 @@ public class CallHelper {
                     Log.e("Camera Error. ", e.getMessage());
                 }
             }
-            // mCamera = Camera.open();
-            // Parameters p = mCamera.getParameters();
+
+            /*
+            *
+            * switch statement that handle the call ringing ,call disconnect ,call end function
+            *
+            * */
 
             switch (state) {
+
+
+                /*
+                *
+                * when call ringing
+                *
+                * */
                 case TelephonyManager.CALL_STATE_RINGING:
 
+                    /*
+                    *
+                    * getting flash mode from sharedprefrences
+                    *
+                    * */
                     flashMode = sp.getString("flash", flashMode);
+
+                    /*
+                    *
+                    * if flash mode is null
+                    *
+                    * */
                     if (flashMode == null) {
                         Toast.makeText(ctx, "Flash is not present sorry",
                                 Toast.LENGTH_LONG).show();
 
+
+                    /*
+                    *
+                    * if flash torch mode in on
+                    *
+                    * */
                     } else if (flashMode.equals(Parameters.FLASH_MODE_TORCH)) {
 
                         Toast.makeText(ctx, "Flash is already on",
                                 Toast.LENGTH_LONG).show();
 
 
+
+                    /*
+                    *
+                    * if flash mode is off means flash is not running
+                    *
+                    * */
                     } else if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
 
 
@@ -79,14 +119,29 @@ public class CallHelper {
                         editor.commit();
                     }
 
-                    // set phone on silent
+                    /*
+                    *
+                    * set phone on vibrate mode  and  set the phone volume is full
+                    *
+                    * */
                     AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
                     am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                     am.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                             AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-                    // get contact name
+
+                    /*
+                    *
+                    * getting the caller name from getContactName function in MainActivity
+                    *
+                    * */
                     String name = mainactivity.getContactName(ctx, incomingNumber);
-                    //check contact name is coming null or not;
+
+                    /*
+                    *
+                    * check contact name is coming null or not if null so
+                    * put name = "unknown person"
+                    *
+                    * */
                     if (name == null) {
                         name = "unknown person";
                     }
@@ -94,12 +149,26 @@ public class CallHelper {
                     /////////////////////
                     Toast.makeText(ctx, name + voicevalue, Toast.LENGTH_LONG).show();
                     ////////////////////
+
+                    /*
+                    *
+                    * if caller name is not null so add name + " is calling"
+                    * and put in sharedprefrences for text_to_speech class
+                    *
+                    * */
                     name = name + " is calling";
                     editor.putString("caller_name", name);
                     editor.commit();
+
+                    /*
+                    *
+                    * check the voice call check box is checked or not.
+                    * if checked so start the text_to_speech service
+                    *
+                    * */
                     if (voicevalue == true) {
 
-                        mainactivity.start_voicecall(ctx, true);
+                        mainactivity.start_text_to_speech(ctx, true);
                         Toast.makeText(ctx, name + "is calling", Toast.LENGTH_LONG).show();
 
                     }
@@ -108,13 +177,31 @@ public class CallHelper {
                     ////////////////////
 
                     break;
+
+                /*
+                *
+                * this case will call when call is received or end without received
+                *
+                * */
                 case TelephonyManager.CALL_STATE_OFFHOOK:
 
-                    // check text_to_speech service is running or not
+                    /*
+                    *
+                    *  check text_to_speech service is running or not
+                    *  if running so stop it. when call will end or received
+                    *
+                    * */
                     if (voicevalue == true) {
-                        mainactivity.start_voicecall(ctx, false);
+                        mainactivity.start_text_to_speech(ctx, false);
                     }
 
+
+                    /*
+                    *
+                    * checking flash mode is off or not if off ,
+                    * so stop the torch preview
+                    *
+                    * */
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
 
@@ -127,6 +214,12 @@ public class CallHelper {
                         editor.putString("flash", flashMode);
                         editor.commit();
 
+                    /*
+                    *
+                    * checking flash mode if flash mode torch is on,
+                    * so stop the preview
+                    *
+                    * */
                     } else if (flashMode.equals(Parameters.FLASH_MODE_TORCH)) {
 
                         p.setFlashMode(Parameters.FLASH_MODE_OFF);
@@ -140,25 +233,45 @@ public class CallHelper {
 
                     break;
 
+
+                /*
+                *
+                * this case call many times
+                * 1. when call user disconnect.
+                * 2. when phone in idle state. this function runs in several times to check
+                *
+                * */
                 case TelephonyManager.CALL_STATE_IDLE:
 
-                    // check text_to_speech service is running or not
+                    /*
+                    *
+                    *  check text_to_speech service is running or not
+                    *
+                    * */
                     if (voicevalue == true) {
-                        mainactivity.start_voicecall(ctx, false);
+                        mainactivity.start_text_to_speech(ctx, false);
                     }
 
+
+                    /*
+                    *
+                    * checking the flash mode is off condition or not
+                    * if yes ,so do nothing
+                    *
+                    *
+                    * */
                     flashMode = sp.getString("flash", flashMode);
                     if (flashMode.equals(Parameters.FLASH_MODE_OFF)) {
 
                         Toast.makeText(ctx, "Flash is already OFF idle",
                                 Toast.LENGTH_LONG).show();
-                        //p.setFlashMode(Parameters.FLASH_MODE_OFF);
-//					mCamera.setParameters(p);
-//					mCamera.stopPreview();
-//					flashMode = p.getFlashMode();
-//					editor.putString("flash", flashMode);
-//					editor.commit();
 
+                    /*
+                    *
+                    * checking the flash mode torch is on or not .
+                    * is yes , so stop the flash .
+                    *
+                    * */
                     } else if (flashMode.equals(Parameters.FLASH_MODE_TORCH)) {
 
                         p.setFlashMode(Parameters.FLASH_MODE_OFF);
@@ -181,34 +294,24 @@ public class CallHelper {
 
     }
 
-    /**
-     * Broadcast receiver to detect the outgoing calls.
-     */
-    public class OutgoingReceiver extends BroadcastReceiver {
-        public OutgoingReceiver() {
-        }
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String number = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-
-            Toast.makeText(ctx, "Outgoing: " + number, Toast.LENGTH_LONG)
-                    .show();
-        }
-
-    }
 
     private Context ctx;
     private TelephonyManager tm;
     private CallStateListener callStateListener;
 
-    private OutgoingReceiver outgoingReceiver;
 
+
+    /*
+    *
+    * initializing the callstatelistener call
+    *
+    * */
     public CallHelper(Context ctx) {
         this.ctx = ctx;
 
         callStateListener = new CallStateListener();
-        outgoingReceiver = new OutgoingReceiver();
+
 
     }
 
@@ -219,18 +322,9 @@ public class CallHelper {
         tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-//        IntentFilter intentFilter = new IntentFilter(
-//                Intent.ACTION_NEW_OUTGOING_CALL);
-//        ctx.registerReceiver(outgoingReceiver, intentFilter);
     }
 
-    /**
-     * Stop calls detection.
-     */
-    public void stop() {
-        tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
-        ctx.unregisterReceiver(outgoingReceiver);
-    }
+
 
 
 

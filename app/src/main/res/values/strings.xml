@@ -7,4 +7,5 @@
     <string name="key_name">caler_name</string>
     <string name="key_MainActivity">MainActivity</string>
     <string name="key_check">check</string>
+    <string name="key_camera_service">CheckCameraService</string>
 </resources>
