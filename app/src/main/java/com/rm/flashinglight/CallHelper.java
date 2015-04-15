@@ -4,13 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.media.AudioManager;
+import android.os.Build;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 
 public class CallHelper {
@@ -30,6 +34,7 @@ public class CallHelper {
         SharedPreferences.Editor editor = sp.edit();
         MainActivity mainactivity;
         boolean voicevalue;
+        SurfaceTexture mPreviewTexture;
 
         @SuppressLint("NewApi")
         @Override
@@ -41,7 +46,7 @@ public class CallHelper {
             /*
             *
             * checking camera is open or not.
-            * if not so open it and initialize the camera
+            * if not, so open it and initialize the camera
             *
             * */
 
@@ -50,11 +55,27 @@ public class CallHelper {
                 try {
                     mCamera = Camera.open();
                     p = mCamera.getParameters();
+
+                    /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                        mCamera.setPreviewTexture(mPreviewTexture);
+
+                    }
+
+
                     flashMode = p.getFlashMode();
                     editor.putString("flash", flashMode);
                     editor.commit();
                 } catch (RuntimeException e) {
                     Log.e("Camera Error. ", e.getMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -113,6 +134,24 @@ public class CallHelper {
 
                         p.setFlashMode(Parameters.FLASH_MODE_TORCH);
                         mCamera.setParameters(p);
+
+                    /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                            try {
+                                mCamera.setPreviewTexture(mPreviewTexture);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
                         mCamera.startPreview();
                         flashMode = p.getFlashMode();
                         editor.putString("flash", flashMode);
@@ -178,6 +217,14 @@ public class CallHelper {
 
                     break;
 
+
+
+
+
+
+
+
+
                 /*
                 *
                 * this case will call when call is received or end without received
@@ -209,6 +256,24 @@ public class CallHelper {
                                 Toast.LENGTH_LONG).show();
                         p.setFlashMode(Parameters.FLASH_MODE_OFF);
                         mCamera.setParameters(p);
+
+                    /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                            try {
+                                mCamera.setPreviewTexture(mPreviewTexture);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
                         mCamera.stopPreview();
                         flashMode = p.getFlashMode();
                         editor.putString("flash", flashMode);
@@ -224,6 +289,25 @@ public class CallHelper {
 
                         p.setFlashMode(Parameters.FLASH_MODE_OFF);
                         mCamera.setParameters(p);
+
+                    /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                            try {
+                                mCamera.setPreviewTexture(mPreviewTexture);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+
                         mCamera.stopPreview();
                         flashMode = p.getFlashMode();
                         editor.putString("flash", flashMode);
@@ -276,6 +360,25 @@ public class CallHelper {
 
                         p.setFlashMode(Parameters.FLASH_MODE_OFF);
                         mCamera.setParameters(p);
+
+
+                    /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                            try {
+                                mCamera.setPreviewTexture(mPreviewTexture);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
                         mCamera.stopPreview();
                         flashMode = p.getFlashMode();
                         editor.putString("flash", flashMode);
@@ -323,8 +426,6 @@ public class CallHelper {
         tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
     }
-
-
 
 
 
