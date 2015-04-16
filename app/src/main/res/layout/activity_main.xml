@@ -62,13 +62,30 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/voice_call"
             android:layout_margin="10dp"
+            android:background="@drawable/radial_background"
             card_view:cardCornerRadius="4dp">
 
-            <Button
-                android:id="@+id/flashbutton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Flash Light"/>
+            <ImageButton
+                android:id="@+id/btnSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:src="@drawable/btn_switch_on"
+                android:background="@null"
+                android:contentDescription="@null"
+                />
+            <TextView
+                android:id="@+id/flashtext"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="15dip"
+                android:textSize="13dip"
+                android:textColor="#3b3b3b"
+                android:layout_marginBottom="15dip"/>
         </android.support.v7.widget.CardView>
 
     </RelativeLayout>

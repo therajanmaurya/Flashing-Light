@@ -1,24 +1,37 @@
 package com.rm.flashinglight;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -32,7 +45,16 @@ public class MainActivity extends ActionBarActivity {
     private TextToSpeech myTTS;
     public Text_to_speech t;
     CheckBox box;
+    public TextView flashtext;
+    private CardView flashcard;
 
+
+    ImageButton flashbutton;
+    private Camera camera;
+    private boolean isFlashOn;
+    Parameters params;
+    private SurfaceTexture mPreviewTexture;
+    MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.key_MainActivity), MODE_PRIVATE);
 
        /*
-       * Checking Camera Service is available or Not
+       * Checking Camera Flash Service is available or Not
        *
        * if Available , So put the value "True" in sharedprefreces
        *
@@ -67,9 +89,62 @@ public class MainActivity extends ActionBarActivity {
         start = (RadioButton) findViewById(R.id.radio_start);
         stop = (RadioButton) findViewById(R.id.radio_stop);
         box = (CheckBox) findViewById(R.id.checkbox_cheese);
+        flashbutton = (ImageButton) findViewById(R.id.btnSwitch);
+        flashtext = (TextView)findViewById(R.id.flashtext);
+        flashcard = (CardView)findViewById(R.id.flashbuttoncard);
+
+        /*
+         * Switch button click event to toggle flash on/off
+		 */
+        flashbutton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (CameraService) {
+
+                    if (isFlashOn) {
+                        // turn off flash
+                        turnOffFlash();
+                    } else {
+                        // turn on flash
+                        turnOnFlash();
+                    }
+
+                }
+            }
+        });
+
+        /*
+        *
+        * Clicking event of Flashing Light
+        *
+        *
+        * */
+        flashcard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (CameraService) {
+
+                    if (isFlashOn) {
+                        // turn off flash
+                        turnOffFlash();
+                    } else {
+                        // turn on flash
+                        turnOnFlash();
+                    }
+
+                }
+            }
+        });
 
 
 
+        // get the camera
+        getCamera();
+
+        // displaying button image
+        toggleButtonImage();
 
 
         /*
@@ -84,6 +159,8 @@ public class MainActivity extends ActionBarActivity {
         checkbox = sharedPref.getBoolean(getString(R.string.key_check), false);
         CameraService = sharedPref.getBoolean(getString(R.string.key_camera_service), false);
         Toast.makeText(this, "" + checkbox, Toast.LENGTH_SHORT).show();
+
+
 
 
         /*
@@ -147,11 +224,38 @@ public class MainActivity extends ActionBarActivity {
                 start_server(true);
 
             }
+
+
         } else {
             start.setEnabled(false);
             stop.setEnabled(false);
+
+            /*
+            *
+            * AlertDialog If Camera Flash is not Available
+            * */
+            AlertDialog alert = new AlertDialog.Builder(MainActivity.this)
+                    .create();
+            alert.setTitle("Error");
+            alert.setMessage("Sorry, your device doesn't support flash light!");
+            alert.setButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // closing the application
+                    // finish();
+                }
+            });
+            alert.show();
+
+            flashtext.setText("Sorry your device does not support Camera Flash Service ");
             Toast.makeText(this, "flash is not available", Toast.LENGTH_SHORT).show();
         }
+
+
+
+
+
+
+
     }
 
 
@@ -330,7 +434,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.about) {
             return true;
         }
 
@@ -490,5 +594,179 @@ public class MainActivity extends ActionBarActivity {
             stopService(intent);
         }
     }
+
+    /*
+	 * Get the camera
+	 */
+    private void getCamera() {
+        if (camera == null) {
+            try {
+                mPreviewTexture = new SurfaceTexture(0);
+                camera = Camera.open();
+                params = camera.getParameters();
+            } catch (RuntimeException e) {
+                Log.e("Camera Error", e.getMessage());
+            }
+        }
+    }
+
+    /*
+     * Turning On flash
+     */
+    private void turnOnFlash() {
+        if (!isFlashOn) {
+            if (camera == null || params == null) {
+                return;
+            }
+            // play sound
+            playSound();
+
+            params = camera.getParameters();
+            params.setFlashMode(Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(params);
+
+            /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                try {
+                    camera.setPreviewTexture(mPreviewTexture);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            camera.startPreview();
+            isFlashOn = true;
+
+            // changing button/switch image
+            toggleButtonImage();
+        }
+
+    }
+
+    /*
+     * Turning Off flash
+     */
+    private void turnOffFlash() {
+        if (isFlashOn) {
+            if (camera == null || params == null) {
+                return;
+            }
+            // play sound
+            playSound();
+
+            params = camera.getParameters();
+            params.setFlashMode(Parameters.FLASH_MODE_OFF);
+            camera.setParameters(params);
+
+            /*
+                    *
+                    * if Build version is greater than Kitkat(19) then set Preview Texture of new Camera2 API
+                    * for making compatible Lolipop
+                    *
+                    * */
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+
+                try {
+                    camera.setPreviewTexture(mPreviewTexture);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            camera.stopPreview();
+            isFlashOn = false;
+
+            // changing button/switch image
+            toggleButtonImage();
+        }
+    }
+
+    /*
+     * Playing sound
+     * will play button toggle sound on flash on / off
+     * */
+    private void playSound() {
+        if (isFlashOn) {
+            mp = MediaPlayer.create(MainActivity.this, R.raw.light_switch_off);
+        } else {
+            mp = MediaPlayer.create(MainActivity.this, R.raw.light_switch_on);
+        }
+        mp.setOnCompletionListener(new OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                // TODO Auto-generated method stub
+                mp.release();
+            }
+        });
+        mp.start();
+    }
+
+    /*
+     * Toggle switch button images
+     * changing image states to on / off
+     * */
+    private void toggleButtonImage() {
+        if (isFlashOn) {
+            flashbutton.setImageResource(R.drawable.btn_switch_on);
+        } else {
+            flashbutton.setImageResource(R.drawable.btn_switch_off);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // on pause turn off the flash
+        turnOffFlash();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+//        // on resume turn on the flash
+//        if (hasFlash)
+//            turnOnFlash();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // on starting the app get the camera params
+        getCamera();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // on stop release the camera
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+    }
+
 
 }

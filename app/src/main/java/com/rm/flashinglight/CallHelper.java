@@ -53,6 +53,7 @@ public class CallHelper {
 
             if (mCamera == null) {
                 try {
+                    mPreviewTexture = new SurfaceTexture(0);
                     mCamera = Camera.open();
                     p = mCamera.getParameters();
 
