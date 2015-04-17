@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,9 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.io.IOException;
 
@@ -55,6 +59,8 @@ public class MainActivity extends ActionBarActivity {
     Parameters params;
     private SurfaceTexture mPreviewTexture;
     MediaPlayer mp;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +98,18 @@ public class MainActivity extends ActionBarActivity {
         flashbutton = (ImageButton) findViewById(R.id.btnSwitch);
         flashtext = (TextView)findViewById(R.id.flashtext);
         flashcard = (CardView)findViewById(R.id.flashbuttoncard);
+        // Gets the ad view defined in layout/activity_main.xml with ad unit ID set in
+        // values/strings.xml.
+        mAdView = (AdView) findViewById(R.id.adView);
+
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("2A4768B61989D7EB7B8B68F239A0198F").build();
+
+        // Start loading the ad in the background.
+        mAdView.loadAd(adRequest);
+
+
+
+
 
         /*
          * Switch button click event to toggle flash on/off
@@ -428,17 +446,34 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.about:
+                DialogFragment aboutD = new About();
+                aboutD.show(getSupportFragmentManager(), "About");
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.about) {
-            return true;
+
+            case R.id.share:
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "This App for those who have some problem with his EYES and EARS And Normal people also";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Flashing Light Android App");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                MainActivity.this.overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.bounce_interpolator);
+                return true;
+
+
+            case R.id.rate:
+                Intent rate = new Intent(android.content.Intent.ACTION_VIEW);
+                rate.setData(Uri.parse("market://details?id=com.pawan.forcealarm"));
+                startActivity(rate);
+                MainActivity.this.overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+                return true;
+            default:
+
         }
-
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
 
@@ -724,11 +759,17 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
         super.onDestroy();
     }
 
     @Override
     protected void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
         super.onPause();
 
         // on pause turn off the flash
@@ -743,6 +784,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
 
 //        // on resume turn on the flash
 //        if (hasFlash)

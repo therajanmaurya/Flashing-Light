@@ -8,4 +8,5 @@
     <string name="key_MainActivity">MainActivity</string>
     <string name="key_check">check</string>
     <string name="key_camera_service">CheckCameraService</string>
+    <string name="banner_ad_unit_id">ca-app-pub-2887387701242753/3433428620</string>
 </resources>
